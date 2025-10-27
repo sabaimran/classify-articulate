@@ -1,9 +1,12 @@
 # category/generate_data.py
-# We have base_sentence.txt, which contains 200 high-quality English sentences, each on a new line. 
-# We have a particular category that we want to match - in this case, topic-related sentences.
-# Using this base dataset, we first load the sentences and use them as reference to generate n new sentences related to the topic.
-# Then, we select n examples of sentences that are NOT related to the topic from the base dataset.
-# This constructs our final .csv dataset with positive and negative labeled examples, which will be used for few-shot 'training' and evaluation.
+
+"""
+We have base_sentence.txt, which contains 200 high-quality English sentences, each on a new line. 
+We have a particular category that we want to match - in this case, topic-related sentences.
+Using this base dataset, we first load the sentences and use them as reference to generate n new sentences related to the topic.
+Then, we select n examples of sentences that are NOT related to the topic from the base dataset.
+This constructs our final .csv dataset with positive and negative labeled examples, which will be used for few-shot 'training' and evaluation.
+"""
 
 from openai import OpenAI
 import os
