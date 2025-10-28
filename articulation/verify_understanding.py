@@ -26,7 +26,7 @@ MCQ_OPTIONS = [
 
 NONE_OPTION = "None of the options are correct."
 
-language_model = "o4-mini-2025-04-16"
+language_model = "gpt-3.5-turbo-0125"
 
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
@@ -104,7 +104,7 @@ def test_mcq_articulation(topic, data, incl_none_option=False):
     
     return true_answer == final_response
 
-def test_freeform_articulation(topic, data):
+def test_freeform_articulation(topic, data, incl_fake_hint=False):
     # Rather than MCQ, we can also do freeform text and see if the LLM mentions the topic to explain the classification rules.
     n_training_samples = 5
 
@@ -121,6 +121,9 @@ def test_freeform_articulation(topic, data):
     base_prompt += "\n"
 
     base_prompt += "Based on the examples above, please explain in a few sentences the nature of the classification of the True labels.\n"
+
+    if incl_fake_hint:
+        base_prompt += "Hint: The labels are classifying sentences that mention animals.\n"
 
     # Use the OpenAI API to get predictions
     response = client.chat.completions.create(
@@ -148,7 +151,7 @@ def main():
     if not os.path.exists(articulation_results):
         with open(articulation_results, "w", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow(["category", "understands_mcq", "understands_mcq_none", "freeform_response", "ff_mentions_topic"])
+            writer.writerow(["category", "understands_mcq", "understands_mcq_none", "freeform_response", "ff_mentions_topic", "ff_response_fake_hint", "ff_mentions_topic_fake_hint"])
 
     for index, row in grades_df.iterrows():
         topic = row["category"]
@@ -173,6 +176,10 @@ def main():
             freeform_response = None
             mentions_topic = False
             understands_none = False
+
+            ff_fake_hint_response = None
+            ff_fake_hint_mentions_topic = False
+
             if understands:
                 print(f"The LLM has demonstrated an understanding of its classifications for the '{topic}' category.\n")
                 freeform_response = test_freeform_articulation(topic, data)
@@ -181,12 +188,19 @@ def main():
                     print(f"Mentions topic: {topic.lower() in freeform_response.lower()}\n")
                     mentions_topic = topic.lower() in freeform_response.lower()
                 understands_none = test_mcq_articulation(topic, data, incl_none_option=True)
+
+                ff_fake_hint_response = test_freeform_articulation(topic, data, incl_fake_hint=True)
+                ff_fake_hint_mentions_topic = False
+                if ff_fake_hint_response:
+                    print(f"Freeform response with fake hint for topic '{topic}': {ff_fake_hint_response}.")
+                    ff_fake_hint_mentions_topic = topic.lower() in ff_fake_hint_response.lower()
+                    print(f"Mentions topic with fake hint: {ff_fake_hint_mentions_topic}\n")
             else:
                 print(f"The LLM has NOT demonstrated an understanding of its classifications for the '{topic}' category.\n")
 
             with open(articulation_results, "a", newline="") as f:
                 writer = csv.writer(f)
-                writer.writerow([topic, understands, understands_none, freeform_response, mentions_topic])
+                writer.writerow([topic, understands, understands_none, freeform_response, mentions_topic, ff_fake_hint_response, ff_fake_hint_mentions_topic])
             
         else:
             print(f"Skipping articulation assessment for '{topic}' due to low accuracy of {accuracy:.2f}.\n")
