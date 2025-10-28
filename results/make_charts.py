@@ -10,30 +10,14 @@ import matplotlib.pyplot as plt
 import glob
 import numpy as np
 
-def make_charts():
-    # Find all topic grades files
-    files = glob.glob("data/grades/topic_grades_*.csv")
-    
-    if not files:
-        print("No topic grade CSV files found in data/ directory.")
+def plot_metrics(grades_df, file_prefix=""):
+    if grades_df.empty:
         return
-
-    all_grades = []
-    for f in files:
-        df = pd.read_csv(f)
-        model_name_parts = os.path.basename(f).replace('topic_grades_', '').replace('.csv', '').split('_')
-        df['model'] = '_'.join(model_name_parts[:2])
-        all_grades.append(df)
-    
-    grades_df = pd.concat(all_grades, ignore_index=True)
 
     # Assign colors to models
     models = grades_df['model'].unique()
     colors = plt.cm.get_cmap('tab10', len(models))
     model_colors = {model: colors(i) for i, model in enumerate(models)}
-
-    # Create a directory for results if it doesn't exist
-    os.makedirs("results", exist_ok=True)
 
     metrics = ['accuracy', 'precision', 'recall', 'f1']
     
@@ -60,8 +44,95 @@ def make_charts():
         ax.legend()
         
         plt.tight_layout()
-        plt.savefig(f"results/{metric}_by_category.png")
+        plt.savefig(f"results/{file_prefix}{metric}_by_category.png")
         plt.close()
+
+def make_charts():
+    # Find all topic grades files
+    files = glob.glob("data/grades/topic_grades_*.csv")
+    
+    if not files:
+        print("No topic grade CSV files found in data/ directory.")
+        return
+
+    all_grades = []
+    for f in files:
+        df = pd.read_csv(f)
+        model_name_parts = os.path.basename(f).replace('topic_grades_', '').replace('.csv', '').split('_')
+        df['model'] = '_'.join(model_name_parts[:2])
+        all_grades.append(df)
+    
+    grades_df = pd.concat(all_grades, ignore_index=True)
+
+    # Create a directory for results if it doesn't exist
+    os.makedirs("results", exist_ok=True)
+
+    # Separate sentence topics
+    sentence_grades_df = grades_df[grades_df['category'].str.startswith('sentence')]
+    other_grades_df = grades_df[~grades_df['category'].str.startswith('sentence')]
+
+    # Plot metrics for both dataframes
+    plot_metrics(other_grades_df)
+    plot_metrics(sentence_grades_df, file_prefix="sentence_")
+
+def make_articulation_charts():
+    # Find all articulation results files
+    files = glob.glob("data/articulation/articulation_results_*.csv")
+    
+    if not files:
+        print("No articulation results CSV files found in data/ directory.")
+        return
+
+    all_articulation_data = []
+    for f in files:
+        df = pd.read_csv(f)
+        model_name_parts = os.path.basename(f).replace('articulation_results_', '').replace('.csv', '').split('_')
+        model_name = '_'.join(model_name_parts[:2])
+        
+        # Calculate accuracy for boolean-like columns
+        for col in ['understands_mcq', 'understands_mcq_none', 'ff_mentions_topic', 'ff_mentions_topic_fake_hint']:
+            # The values are strings 'True'/'False', so we compare to 'True'
+            if col in df.columns:
+                accuracy = (df[col].astype(str) == 'True').mean()
+                all_articulation_data.append({'model': model_name, 'metric': col, 'accuracy': accuracy})
+            else:
+                print(f"Warning: Column '{col}' not found in {f}. Skipping.")
+    
+    articulation_df = pd.DataFrame(all_articulation_data)
+
+    # Assign colors to models
+    models = articulation_df['model'].unique()
+    colors = plt.cm.get_cmap('tab10', len(models))
+    model_colors = {model: colors(i) for i, model in enumerate(models)}
+
+    # Create a directory for results if it doesn't exist
+    os.makedirs("results", exist_ok=True)
+
+    pivot_df = articulation_df.pivot(index='metric', columns='model', values='accuracy')
+    
+    n_models = len(pivot_df.columns)
+    n_metrics = len(pivot_df.index)
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    bar_width = 0.8 / n_models
+    index = np.arange(n_metrics)
+    
+    for i, model in enumerate(pivot_df.columns):
+        ax.bar(index + i * bar_width, pivot_df[model], bar_width, label=model, color=model_colors[model])
+
+    ax.set_xlabel('Articulation Metric')
+    ax.set_ylabel('Accuracy')
+    ax.set_title('Articulation Accuracy by Model')
+    ax.set_xticks(index + bar_width * (n_models - 1) / 2)
+    ax.set_xticklabels([m.replace('_', ' ').title() for m in pivot_df.index], rotation=45, ha="right")
+    ax.set_ylim(0, 1)
+    ax.legend()
+    
+    plt.tight_layout()
+    plt.savefig("results/articulation_accuracy_by_model.png")
+    plt.close()
 
 if __name__ == "__main__":
     make_charts()
+    make_articulation_charts()
