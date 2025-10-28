@@ -88,7 +88,7 @@ MCQ_OPTIONS_BY_CATEGORY = {
 
 NONE_OPTION = "None of the options are correct."
 
-language_model = "gpt-5-2025-08-07"
+language_model = None
 
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
@@ -265,4 +265,7 @@ def main():
             print(f"Skipping articulation assessment for '{topic}' due to low accuracy of {accuracy:.2f}.\n")
 
 if __name__ == "__main__":
-    main()
+    llms = ["gpt-3.5-turbo-0125", "gpt-4", "gpt-4.1-nano-2025-04-14", "gpt-5-2025-08-07"]
+    for lm in llms:
+        language_model = lm
+        main()
