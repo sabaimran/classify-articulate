@@ -1,4 +1,4 @@
-# category/grade_classifier.py
+# grade_classifier.py
 
 """
 This script evaluates the performance of an LLM-based category classifier by grading its predictions against a labeled dataset.
@@ -16,7 +16,7 @@ load_dotenv()
 
 client = OpenAI()
 
-language_model = "gpt-4.1-nano-2025-04-14"
+language_model = "gpt-4"
 
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
