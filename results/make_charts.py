@@ -127,7 +127,18 @@ def make_articulation_charts():
     ax.set_xticks(index + bar_width * (n_models - 1) / 2)
     ax.set_xticklabels([m.replace('_', ' ').title() for m in pivot_df.index], rotation=45, ha="right")
     ax.set_ylim(0, 1)
-    ax.legend()
+    
+    # Add a legend for the models
+    model_legend = ax.legend(title='Models')
+    ax.add_artist(model_legend)
+
+    # Add a second legend for the abbreviations
+    from matplotlib.patches import Patch
+    abbreviation_legend_handles = [
+        Patch(color='none', label='FF = Freeform Response'),
+        Patch(color='none', label='MCQ = Multiple Choice Question')
+    ]
+    ax.legend(handles=abbreviation_legend_handles, loc='lower right', title='Abbreviations')
     
     plt.tight_layout()
     plt.savefig("results/articulation_accuracy_by_model.png")
