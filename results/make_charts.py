@@ -10,14 +10,20 @@ import matplotlib.pyplot as plt
 import glob
 import numpy as np
 
+# Define a consistent color map for models
+all_files = glob.glob("data/topic_grades_*.csv") + glob.glob("data/articulation_results_*.csv")
+all_models = set()
+for f in all_files:
+    model_name_parts = os.path.basename(f).replace('topic_grades_', '').replace('articulation_results_', '').replace('.csv', '').split('_')
+    all_models.add('_'.join(model_name_parts[:2]))
+
+colors = plt.cm.get_cmap('tab10', len(all_models))
+MODEL_COLORS = {model: colors(i) for i, model in enumerate(sorted(list(all_models)))}
+
+
 def plot_metrics(grades_df, file_prefix=""):
     if grades_df.empty:
         return
-
-    # Assign colors to models
-    models = grades_df['model'].unique()
-    colors = plt.cm.get_cmap('tab10', len(models))
-    model_colors = {model: colors(i) for i, model in enumerate(models)}
 
     metrics = ['accuracy', 'precision', 'recall', 'f1']
     
@@ -33,7 +39,7 @@ def plot_metrics(grades_df, file_prefix=""):
         index = np.arange(n_categories)
         
         for i, model in enumerate(pivot_df.columns):
-            ax.bar(index + i * bar_width, pivot_df[model], bar_width, label=model, color=model_colors[model])
+            ax.bar(index + i * bar_width, pivot_df[model], bar_width, label=model, color=MODEL_COLORS.get(model))
 
         ax.set_xlabel('Category')
         ax.set_ylabel(metric.capitalize())
@@ -100,11 +106,6 @@ def make_articulation_charts():
     
     articulation_df = pd.DataFrame(all_articulation_data)
 
-    # Assign colors to models
-    models = articulation_df['model'].unique()
-    colors = plt.cm.get_cmap('tab10', len(models))
-    model_colors = {model: colors(i) for i, model in enumerate(models)}
-
     # Create a directory for results if it doesn't exist
     os.makedirs("results", exist_ok=True)
 
@@ -119,7 +120,7 @@ def make_articulation_charts():
     index = np.arange(n_metrics)
     
     for i, model in enumerate(pivot_df.columns):
-        ax.bar(index + i * bar_width, pivot_df[model], bar_width, label=model, color=model_colors[model])
+        ax.bar(index + i * bar_width, pivot_df[model], bar_width, label=model, color=MODEL_COLORS.get(model))
 
     ax.set_xlabel('Articulation Metric')
     ax.set_ylabel('Accuracy')
