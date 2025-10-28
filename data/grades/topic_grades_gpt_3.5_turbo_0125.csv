@@ -1,0 +1,17 @@
+category,accuracy,precision,recall,f1
+plants,0.89,0.82,1.00,0.90
+medicine,0.93,0.95,0.91,0.93
+phones,0.94,0.90,1.00,0.95
+religion,0.94,0.93,0.96,0.95
+wars,0.97,0.96,0.98,0.97
+fantasy,0.96,0.92,1.00,0.96
+cities,0.94,0.90,1.00,0.95
+weather,0.99,0.98,1.00,0.99
+fruit,0.99,0.98,1.00,0.99
+animal,0.96,0.92,1.00,0.96
+mountains,0.99,0.98,1.00,0.99
+sentence_100,0.58,0.62,0.42,0.50
+sentence_25,0.51,0.51,0.35,0.41
+sentence_decimal,0.60,0.17,0.03,0.06
+sentence_comma,0.52,0.54,0.27,0.36
+sentence_special,0.45,0.39,0.16,0.23
