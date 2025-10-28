@@ -14,7 +14,7 @@ I wanted to present the model with a classification task related to identifying 
 
 The topics chosen were: plants, medicine, phones, religion, wars, fantasy, cities, weather, fruit, animal, and mountains. I chose to select a wide variety of topics to ensure some generalization in the task, while retaining consistency in the type of classification for accurate measurement.
 
-I constructed the classification dataset with a mix of public data and LLM-generated data. To ensure that the sentences used for this classification task reflected real-life variance in human (English) language, I pulled base sentences from this [agentlans - high quality English sentences dataset](https://huggingface.co/datasets/agentlans/high-quality-english-sentences). I did this by writing a script that generates similar data for any topic with a few modifications.
+I constructed the classification dataset with a mix of public data and LLM-generated data. To ensure that the sentences used for this classification task reflected real-life variance in human (English) language, I pulled base sentences from this [agentlans - high quality English sentences dataset](https://huggingface.co/datasets/agentlans/high-quality-english-sentences). I did this by writing [a script](https://github.com/sabaimran/classify-articulate/blob/main/typographical/generate_data.py) that generates similar data for any topic with a few modifications.
 
 Given these base sentences, for each category, I had an LLM generate sentences that are similar in tone, quality, and length, but limited in content to the specific category being tested (e.g., medicine, plants, etc.). From there, I had high quality, labeled datasets with positive and negative sentences belonging to each of the 11 categories.
 
@@ -43,7 +43,7 @@ Building on top of the same `agentlas` dataset, I also created a secondary datas
 
 Across all categories, models were able to classify appropriately and articulate their reasoning correctly. I tested the four target models across the range of classification tasks, taking into account the accuracy to measure performance.
 
-Most of the models breezed through the topic-based classification tasks, scoring upwards of 95%.
+Most of the models breezed through the topic-based classification tasks, scoring upwards of 95% in accuracy. We define accuracy as `(TP + TN) / SAMPLES`.
 
 Articulation tests also showed strong model performance. Most of them were able to successfully select the correct topic categories. I increased the difficulty of the MCQ portion by adding other options that were similar but incorrect, which did result in some performance degradation.
 
@@ -63,13 +63,15 @@ The models were not able to pass the typographical challenges, so I did not do f
 
 ## Further Work
 
-The classification task I focused on for the scope of this assessment seemed to be trivially easy for models even from 2-3 years ago. To further assess articulation capabilities, it would be necessary to run a classification task that is slightly more difficult for models to complete.
+The classification task I focused on for the scope of this assessment seemed to be trivially easy for models even from 2-3 years ago. To further assess articulation capabilities, it may be helpful to run a classification task that is slightly more difficult for models to complete.
 
 This may include construction of a dataset with more subtle differences in categorization (e.g., sentences all contain mentions of cities, but only want to select cities > 2M population, sentences all contain a number, but only want to select prime numbers).
 
 It's important to note that tasks that are too difficult will reflect an increase in chain of thought adherence, making it harder to find potentially mismatched reasoning traces.
 
-Where the categorization itself is more difficult, articulation may also become trickier, as models may not be able to pinpoint exactly why they have answered the way they have. To further extend the experiment, it may also be interesting to assess adherence when the topic might be 'taboo' per the training constitution of the model (e.g., related to CBRNs or adult content).
+Where the categorization itself is more difficult (leading to lower classification accuracy), articulation may not provide much insight, as models may not be able to pinpoint exactly why they have answered the way they have.
+
+To further extend the experiment, it may also be interesting to assess adherence when the topic might be 'taboo' per the training constitution of the model (e.g., related to CBRNs or adult content).
 
 My original intuition was that letter-counting or typographical tests would be less deterministic to evaluate. To verify this, I added in the typographical experiment in which the model was tasked with classifying on conditions such as character count, presence of special characters, and sentence length. These did not meet the accuracy criteria for articulation testing. I think these tests may be good candidates for this experiment if classification can be improved, as the model may not always be able to pinpoint the nature of the classification when it does not elicit a semantic correlation in its activations.
 
