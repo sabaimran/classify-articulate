@@ -16,6 +16,8 @@ load_dotenv()
 
 client = OpenAI()
 
+language_model = "gpt-3.5-turbo-0125"
+
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
     return list(zip(df["sentence"], df["is_related"]))
@@ -55,7 +57,7 @@ def test_llm(data):
         base_prompt += f"False: {s}\n"
     base_prompt += "\n"
 
-    base_prompt += "Based on the examples above, classify the following sentences as True (related) or False (not related):\n"
+    base_prompt += "Based on the examples above, classify the following sentences as True (related) or False (not related). Return ONLY 'true' or 'false' and nothing else:\n"
 
     # For the rest of the dataset, get predictions in order to determine performance
     predictions = {}
@@ -70,7 +72,7 @@ def test_llm(data):
         for attempt in range(max_retries):
             # Use the OpenAI API to get predictions
             response = client.chat.completions.create(
-                model="gpt-4",
+                model=language_model,
                 messages=[
                     {"role": "user", "content": prompt}
                 ]
@@ -104,10 +106,12 @@ def main():
     # First, get a list of all csv data files in the data/ directory
     data_files = glob.glob("data/*.csv")
 
-    completed = {"plants", "medicine", "phones", "religion", "wars", "fantasy", "cities", "weather", "fruit", "topic", "articulation", "animal", "mountains"}
+    completed = {"topic", "articulation"}
 
-    if not os.path.exists("data/topic_grades.csv"):
-        with open("data/topic_grades.csv", "w") as f:
+    output_file = f"data/topic_grades_{language_model.replace('-', '_')}.csv"
+
+    if not os.path.exists(output_file):
+        with open(output_file, "w") as f:
             f.write("category,accuracy,precision,recall,f1\n")
 
     for data_file in data_files:
@@ -133,7 +137,7 @@ def main():
         print(f"Recall: {recall:.2f}")
         print(f"F1 Score: {f1:.2f}")
 
-        with open(f"data/topic_grades.csv", "a") as f:
+        with open(output_file, "a") as f:
             f.write(f"{topic},{accuracy:.2f},{precision:.2f},{recall:.2f},{f1:.2f}\n")
 
 if __name__ == "__main__":

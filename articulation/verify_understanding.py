@@ -23,6 +23,8 @@ MCQ_OPTIONS = [
     "The labels are classifying sentences that relate to history."
 ]
 
+language_model = "gpt-3.5-turbo-0125"
+
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
     return list(zip(df["sentence"], df["is_related"]))
@@ -66,7 +68,7 @@ def test_mcq_articulation(topic, data):
     for attempt in range(max_retries):
         # Use the OpenAI API to get predictions
         response = client.chat.completions.create(
-            model="gpt-4",
+            model=language_model,
             messages=[
                 {"role": "user", "content": prompt}
             ]
@@ -131,9 +133,9 @@ def test_freeform_articulation(topic, data):
 
 def main():
     # First, get the topic_grades.csv
-    grades_df = read_csv("data/topic_grades.csv")
+    grades_df = read_csv(f"data/topic_grades_{language_model.replace('-', '_')}.csv")
 
-    articulation_results = "data/articulation_results.csv"
+    articulation_results = f"data/articulation_results_{language_model.replace('-', '_')}.csv"
 
     if not os.path.exists(articulation_results):
         with open(articulation_results, "w") as f:
