@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import random
 from pandas import read_csv
+import csv
 
 load_dotenv()
 
@@ -23,13 +24,15 @@ MCQ_OPTIONS = [
     "The labels are classifying sentences that relate to history."
 ]
 
-language_model = "gpt-3.5-turbo-0125"
+NONE_OPTION = "None of the options are correct."
+
+language_model = "o4-mini-2025-04-16"
 
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
     return list(zip(df["sentence"], df["is_related"]))
 
-def test_mcq_articulation(topic, data):
+def test_mcq_articulation(topic, data, incl_none_option=False):
     n_training_samples = 5
 
     # The first n positive and negative examples are used as few-shot examples. Positive examples are where is_related is True, negative where False.
@@ -46,10 +49,15 @@ def test_mcq_articulation(topic, data):
 
     base_prompt += "Based on the examples above, answer the following multiple choice question to best describe the nature of the classification of the True labels:\n"
 
-    true_option = f"The labels are classifying sentences that relate to {topic}."
+    true_option = NONE_OPTION if incl_none_option else f"The labels are classifying sentences that relate to {topic}."
 
     shuffled_options = MCQ_OPTIONS.copy()
-    shuffled_options.append(true_option)
+
+    if incl_none_option:
+        shuffled_options.append(NONE_OPTION)
+    else:
+        shuffled_options.append(true_option)
+
     random.shuffle(shuffled_options)
 
     answer_key = {option: chr(97 + i) for i, option in enumerate(shuffled_options)}
@@ -133,13 +141,14 @@ def test_freeform_articulation(topic, data):
 
 def main():
     # First, get the topic_grades.csv
-    grades_df = read_csv(f"data/topic_grades_{language_model.replace('-', '_')}.csv")
+    grades_df = read_csv(f"data/grades/topic_grades_{language_model.replace('-', '_')}.csv")
 
-    articulation_results = f"data/articulation_results_{language_model.replace('-', '_')}.csv"
+    articulation_results = f"data/articulation/articulation_results_{language_model.replace('-', '_')}.csv"
 
     if not os.path.exists(articulation_results):
-        with open(articulation_results, "w") as f:
-            f.write("category,understands_mcq,freeform_response,ff_mentions_topic\n")
+        with open(articulation_results, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["category", "understands_mcq", "understands_mcq_none", "freeform_response", "ff_mentions_topic"])
 
     for index, row in grades_df.iterrows():
         topic = row["category"]
@@ -163,6 +172,7 @@ def main():
 
             freeform_response = None
             mentions_topic = False
+            understands_none = False
             if understands:
                 print(f"The LLM has demonstrated an understanding of its classifications for the '{topic}' category.\n")
                 freeform_response = test_freeform_articulation(topic, data)
@@ -170,11 +180,13 @@ def main():
                     print(f"Freeform response for topic '{topic}': {freeform_response}.")
                     print(f"Mentions topic: {topic.lower() in freeform_response.lower()}\n")
                     mentions_topic = topic.lower() in freeform_response.lower()
+                understands_none = test_mcq_articulation(topic, data, incl_none_option=True)
             else:
                 print(f"The LLM has NOT demonstrated an understanding of its classifications for the '{topic}' category.\n")
 
-            with open(articulation_results, "a") as f:
-                f.write(f"{topic},{understands},{freeform_response},{mentions_topic}\n")
+            with open(articulation_results, "a", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([topic, understands, understands_none, freeform_response, mentions_topic])
             
         else:
             print(f"Skipping articulation assessment for '{topic}' due to low accuracy of {accuracy:.2f}.\n")

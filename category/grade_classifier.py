@@ -16,7 +16,7 @@ load_dotenv()
 
 client = OpenAI()
 
-language_model = "gpt-3.5-turbo-0125"
+language_model = "gpt-4.1-nano-2025-04-14"
 
 def load_dataset(file_path):
     df = read_csv(file_path, quotechar='"', escapechar='\\')
@@ -106,9 +106,9 @@ def main():
     # First, get a list of all csv data files in the data/ directory
     data_files = glob.glob("data/*.csv")
 
-    completed = {"topic", "articulation"}
+    completed = {}
 
-    output_file = f"data/topic_grades_{language_model.replace('-', '_')}.csv"
+    output_file = f"data/grades/topic_grades_{language_model.replace('-', '_')}.csv"
 
     if not os.path.exists(output_file):
         with open(output_file, "w") as f:
