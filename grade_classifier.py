@@ -106,7 +106,7 @@ def main():
     # First, get a list of all csv data files in the data/ directory
     data_files = glob.glob("data/*.csv")
 
-    completed = {}
+    completed = {"animal", "cities", "fantasy", "fruit", "wars", "plants", "religion", "weather", "mountains", "phones", "medicine"}
 
     output_file = f"data/grades/topic_grades_{language_model.replace('-', '_')}.csv"
 
@@ -118,6 +118,9 @@ def main():
         print(f"Evaluating dataset: {data_file}")
 
         topic = data_file.split("_")[0].split("/")[1]  # Extract topic from filename
+
+        if topic == "sentence":
+            topic += "_" + data_file.split("_")[1]  # Handle multi-word topics
 
         if topic in completed:
             continue
