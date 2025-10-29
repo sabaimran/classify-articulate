@@ -11,10 +11,10 @@ import glob
 import numpy as np
 
 # Define a consistent color map for models
-all_files = glob.glob("data/topic_grades_*.csv") + glob.glob("data/articulation_results_*.csv")
+all_files = glob.glob("data/grades/topic_grades_*.csv") + glob.glob("data/articulation/articulation_results_*.csv") + glob.glob("data/faithfulness/topic_faithfulness_*.csv")
 all_models = set()
 for f in all_files:
-    model_name_parts = os.path.basename(f).replace('topic_grades_', '').replace('articulation_results_', '').replace('.csv', '').split('_')
+    model_name_parts = os.path.basename(f).replace('topic_grades_', '').replace('articulation_results_', '').replace('topic_faithfulness_', '').replace('.csv', '').split('_')
     all_models.add('_'.join(model_name_parts[:2]))
 
 colors = plt.cm.get_cmap('tab10', len(all_models))
@@ -145,6 +145,48 @@ def make_articulation_charts():
     plt.savefig("results/articulation_accuracy_by_model.png")
     plt.close()
 
+def make_faithfulness_charts():
+    # Find all faithfulness results files
+    files = glob.glob("data/faithfulness/topic_faithfulness_*.csv")
+    
+    if not files:
+        print("No faithfulness results CSV files found in data/faithfulness/ directory.")
+        return
+
+    all_faithfulness_data = []
+    for f in files:
+        df = pd.read_csv(f)
+        model_name_parts = os.path.basename(f).replace('topic_faithfulness_', '').replace('.csv', '').split('_')
+        model_name = '_'.join(model_name_parts[:2])
+        
+        # Calculate faithfulness percentage
+        # The values are booleans, so mean will give the percentage of True
+        faithfulness_percentage = df['is_faithful'].mean()
+        
+        all_faithfulness_data.append({'model': model_name, 'faithfulness': faithfulness_percentage})
+
+    if not all_faithfulness_data:
+        return
+        
+    faithfulness_df = pd.DataFrame(all_faithfulness_data)
+    faithfulness_df = faithfulness_df.sort_values(by='model')
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    ax.bar(faithfulness_df['model'], faithfulness_df['faithfulness'], color=[MODEL_COLORS.get(m) for m in faithfulness_df['model']])
+
+    ax.set_xlabel('Model')
+    ax.set_ylabel('Faithfulness Score')
+    ax.set_title('Faithfulness Score by Model')
+    ax.set_xticklabels(faithfulness_df['model'], rotation=45, ha="right")
+    ax.set_ylim(0, 1)
+    
+    plt.tight_layout()
+    plt.savefig("results/faithfulness_by_model.png")
+    plt.close()
+
 if __name__ == "__main__":
     make_charts()
     make_articulation_charts()
+    make_faithfulness_charts()
