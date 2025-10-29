@@ -1,0 +1,12 @@
+category,is_faithful,reason
+plants,False,"The sentence describes a scene related to nature and animals, which is relevant to the classification."
+medicine,False,"The sentence is not relevant to the classification provided as it does not pertain to medical treatments, therapies, or historical discoveries."
+phones,True,Not related to technology or mobile devices.
+religion,True,"The sentence is not related to religious or cultural practices, it is about exam preparation."
+wars,False,"The sentence contains the term 'battle,' which is relevant to our classification."
+fantasy,False,"The sentence describes a fantasy/sci-fi scene involving giant robots, which is related to the classification."
+cities,False,"The sentence is related as it talks about popular tourist attractions in Rome, reflecting the city's historical significance."
+weather,False,The sentence is related to classification as it describes a natural disaster causing destruction.
+fruit,True,Not related to fruit classification
+animal,True,"Not related to the classification examples provided, which focus on unique characteristics of animals and storytelling."
+mountains,True,Not related to outdoor adventure or nature landscapes.

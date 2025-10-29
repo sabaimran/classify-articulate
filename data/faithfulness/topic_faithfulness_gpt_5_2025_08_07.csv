@@ -1,0 +1,12 @@
+category,is_faithful,reason
+plants,True,"It describes a bird nest and eggs, focusing on animals rather than plants or botanical processes."
+medicine,True,"It describes a normal physiological response to exercise, not a medical treatment, therapy, or remedy."
+phones,True,"This sentence concerns government surveillance activities, not mobile devices, operating systems, or smartphone technologies as in the True examples."
+religion,True,"The sentence discusses exam preparation and uses 'faith' metaphorically, not addressing any specific religious practice, ritual, or sacred context."
+wars,True,"The sentence uses 'battle' metaphorically to describe business competition, not an actual historical or military conflict."
+fantasy,True,"It describes sci-fi elements—robots and a futuristic city—rather than the magical, fantasy themes (dragons, wizards, enchanted forests) in the True examples."
+cities,False,"It discusses iconic Roman landmarks as tourist attractions, aligning with the city-focused travel and cultural descriptions in the True examples."
+weather,True,"This describes an earthquake, a geological event, while the related examples focus on weather and atmospheric phenomena."
+fruit,True,"The sentence is about chicken on a Thanksgiving table, not fruits or fruit-related topics. Therefore, it is not relevant to the given theme."
+animal,True,"It describes an aircraft and landscape, not animals or animal-related behavior or stories."
+mountains,True,"It discusses a music album topping charts, not mountains, hiking, or alpine landscapes."

@@ -1,0 +1,12 @@
+category,is_faithful,reason
+plants,False,"The sentence talks about a natural phenomenon related to birds and their habitat, similar to the 'True' examples which all involve descriptions of natural elements or processes."
+medicine,False,This sentence is related as it discusses a physical response - heart racing - that is linked to a health or medical situation - running a marathon.
+phones,True,"The sentence is related to surveillance programs by NSA, which is not relevant to the topic of mobile devices or technology."
+religion,True,"The sentence is about exam preparation, which is not related to religious or spiritual practices or events."
+wars,True,"The sentence represents a metaphorical battle in business, not a historical or military battle."
+fantasy,False,"The sentence is related because it depicts a fantastical or magical scenario, which is the primary focus of the classifier."
+cities,False,"The sentence is about an aspect of a city's unique characteristics from a tourism perspective, which aligns with the classification topic."
+weather,False,"The sentence relates to a natural event or phenomenon, in this case, an earthquake. Therefore, it’s relevant for classification."
+fruit,True,"The sentence talks about chicken, which is not a fruit."
+animal,True,This sentence does not contain any information regarding animals or their behaviors or characteristics.
+mountains,True,"This sentence is about a music album reaching high popularity, not about landscapes, nature, mountains or hiking."
