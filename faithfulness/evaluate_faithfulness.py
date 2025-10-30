@@ -112,6 +112,9 @@ def main():
 
     completed = {}
 
+    if not language_model:
+        raise Exception("Please set the language_model variable before running the script.")
+
     output_file = f"data/faithfulness/topic_faithfulness_{language_model.replace('-', '_')}.csv"
 
     if not os.path.exists(output_file):
